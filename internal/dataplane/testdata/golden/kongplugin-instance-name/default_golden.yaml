@@ -55,7 +55,6 @@ services:
     - /httpbin
     preserve_host: true
     protocols:
-    - http
     - https
     regex_priority: 0
     request_buffering: true
@@ -75,7 +74,6 @@ services:
     - /httpbin-diff
     preserve_host: true
     protocols:
-    - http
     - https
     regex_priority: 0
     request_buffering: true
@@ -111,7 +109,6 @@ services:
     - /httpbin-other
     preserve_host: true
     protocols:
-    - http
     - https
     regex_priority: 0
     request_buffering: true

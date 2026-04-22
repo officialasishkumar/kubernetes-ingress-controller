@@ -70,7 +70,7 @@ func DefaultHTTPClient(opts ...HTTPClientOption) *http.Client {
 				MinVersion: tls.VersionTLS12,
 			}
 		}
-		tr.TLSClientConfig.InsecureSkipVerify = true //nolint:gosec
+		tr.TLSClientConfig.InsecureSkipVerify = true
 	}
 	// It provides the equivalent of `curl --resolve` for the client.
 	if cfg.resolveHostTo != "" {

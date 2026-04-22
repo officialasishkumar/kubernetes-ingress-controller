@@ -20,7 +20,6 @@ services:
     - /.well-known/acme-challenge/yolo
     preserve_host: true
     protocols:
-    - http
     - https
     regex_priority: 0
     request_buffering: true

@@ -36,7 +36,6 @@ services:
     - /
     preserve_host: true
     protocols:
-    - http
     - https
     regex_priority: 0
     request_buffering: true
@@ -73,7 +72,6 @@ services:
     - ~/beta$
     preserve_host: true
     protocols:
-    - http
     - https
     regex_priority: 0
     request_buffering: true
@@ -110,7 +108,6 @@ services:
     - ~/alpha$
     preserve_host: true
     protocols:
-    - http
     - https
     regex_priority: 0
     request_buffering: true

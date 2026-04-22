@@ -16,6 +16,8 @@ services:
     name: foo-namespace.foo.foo-svc.example.com.80
     preserve_host: true
     priority: 57178899677185
+    protocols:
+    - https
     request_buffering: true
     response_buffering: true
     strip_path: false
@@ -40,8 +42,7 @@ services:
   read_timeout: 60000
   retries: 5
   routes:
-  - expression: (http.path ^= "/") && ((net.protocol == "http") || (net.protocol ==
-      "https"))
+  - expression: (http.path ^= "/") && (net.protocol == "https")
     https_redirect_status_code: 426
     id: 01c21dd4-41c1-57b6-a417-66c80b8ad22b
     name: bar-namespace.ing-with-default-backend

@@ -1,6 +1,3 @@
-# By default Ingress listen on only HTTPS.
-# To enable HTTP, add annotation `konghq.com/protocols: "http"` on Ingress resource,
-# see examples/ingress-http.yaml for actual example.
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -45,6 +42,7 @@ metadata:
   name: httpbin-ingress
   annotations:
     konghq.com/strip-path: "true"
+    konghq.com/protocols: "http"
 spec:
   ingressClassName: kong
   rules:

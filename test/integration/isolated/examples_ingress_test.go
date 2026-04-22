@@ -108,9 +108,7 @@ func TestIngressHTTPExample(t *testing.T) {
 			func(ctx context.Context, t *testing.T, _ *envconf.Config) context.Context {
 				cleaner := GetFromCtxForT[*clusters.Cleaner](ctx, t)
 				cluster := GetClusterFromCtx(ctx)
-				var (
-					proxyURLHTTP = GetHTTPURLFromCtx(ctx)
-				)
+				proxyURLHTTP := GetHTTPURLFromCtx(ctx)
 
 				t.Logf("applying yaml manifest %s", ingressExampleManifests)
 				b, err := os.ReadFile(ingressExampleManifests)

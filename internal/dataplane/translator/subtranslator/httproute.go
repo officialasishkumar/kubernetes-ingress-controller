@@ -835,6 +835,9 @@ func protocolsFromHTTPRoutesGatewayListeners(storer store.Storer, routes []*gate
 					protoSet["http"] = struct{}{}
 				case gatewayapi.HTTPSProtocolType:
 					protoSet["https"] = struct{}{}
+				default:
+					// Unsupported protocol, skip.
+					continue
 				}
 			}
 		}

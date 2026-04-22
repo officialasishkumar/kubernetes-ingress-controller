@@ -3311,7 +3311,7 @@ func TestTranslatorHostAliases(t *testing.T) {
 			Hosts:             kong.StringSlice("example.com", "*.example.com", "*.sample.com", "*.illustration.com"),
 			PreserveHost:      kong.Bool(true),
 			Paths:             kong.StringSlice("/"),
-			Protocols:         kong.StringSlice("http", "https"),
+			Protocols:         kong.StringSlice("https"),
 			ID:                kong.String("99296cc1-ab30-59f8-b204-7b1a45e64cac"),
 		}, state.Services[0].Routes[0].Route)
 	})
@@ -3372,7 +3372,7 @@ func TestTranslatorHostAliases(t *testing.T) {
 			Hosts:             kong.StringSlice("example.com"),
 			PreserveHost:      kong.Bool(true),
 			Paths:             kong.StringSlice("/"),
-			Protocols:         kong.StringSlice("http", "https"),
+			Protocols:         kong.StringSlice("https"),
 			ID:                kong.String("99296cc1-ab30-59f8-b204-7b1a45e64cac"),
 		}, state.Services[0].Routes[0].Route)
 	})
@@ -3434,7 +3434,7 @@ func TestTranslatorHostAliases(t *testing.T) {
 			Hosts:             kong.StringSlice("example.com", "*.example.com"),
 			PreserveHost:      kong.Bool(true),
 			Paths:             kong.StringSlice("/"),
-			Protocols:         kong.StringSlice("http", "https"),
+			Protocols:         kong.StringSlice("https"),
 			ID:                kong.String("99296cc1-ab30-59f8-b204-7b1a45e64cac"),
 		}, state.Services[0].Routes[0].Route)
 	})

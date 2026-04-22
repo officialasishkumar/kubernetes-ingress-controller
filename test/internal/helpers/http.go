@@ -21,8 +21,9 @@ import (
 )
 
 type httpClientCfg struct {
-	resolveHostTo string
-	rootCAs       *x509.CertPool
+	resolveHostTo      string
+	rootCAs            *x509.CertPool
+	insecureSkipVerify bool
 }
 
 // HTTPClientOption is a functional option for configuring the HTTP client.
@@ -42,6 +43,12 @@ func WithRootCAs(rootCAs *x509.CertPool) HTTPClientOption {
 	}
 }
 
+func WithInsecureSkipVerify() HTTPClientOption {
+	return func(opts *httpClientCfg) {
+		opts.insecureSkipVerify = true
+	}
+}
+
 // DefaultHTTPClient returns a client that should be used by default in tests.
 // All defaults that should be propagated to tests for use should be changed in here.
 func DefaultHTTPClient(opts ...HTTPClientOption) *http.Client {
@@ -56,6 +63,14 @@ func DefaultHTTPClient(opts ...HTTPClientOption) *http.Client {
 			RootCAs:    cfg.rootCAs,
 			MinVersion: tls.VersionTLS12,
 		}
+	}
+	if cfg.insecureSkipVerify {
+		if tr.TLSClientConfig == nil {
+			tr.TLSClientConfig = &tls.Config{
+				MinVersion: tls.VersionTLS12,
+			}
+		}
+		tr.TLSClientConfig.InsecureSkipVerify = true //nolint:gosec
 	}
 	// It provides the equivalent of `curl --resolve` for the client.
 	if cfg.resolveHostTo != "" {
@@ -111,6 +126,11 @@ func MustHTTPRequest(t *testing.T, method string, host, path string, headers map
 // Testing Utility Functions - Various HTTP related
 // -----------------------------------------------------------------------------
 
+type HTTPSOptions struct {
+	InsecureSkipVerify bool
+	CertPool           *x509.CertPool
+}
+
 // EventuallyGETPath makes a GET request to the Kong proxy multiple times until
 // either the request starts to respond with the given status code and contents
 // present in the response body, or until timeout occurs according to ingressWait
@@ -125,7 +145,7 @@ func EventuallyGETPath(
 	proxyURL *url.URL,
 	host string,
 	path string,
-	certPool *x509.CertPool,
+	httpsOpts *HTTPSOptions,
 	statusCode int,
 	bodyContent string,
 	requestHeaders map[string]string,
@@ -138,8 +158,13 @@ func EventuallyGETPath(
 	if proxyURL != nil {
 		clientOptions = append(clientOptions, WithResolveHostTo(proxyURL.Host))
 	}
-	if certPool != nil {
-		clientOptions = append(clientOptions, WithRootCAs(certPool))
+	if httpsOpts != nil {
+		if httpsOpts.CertPool != nil {
+			clientOptions = append(clientOptions, WithRootCAs(httpsOpts.CertPool))
+		}
+		if httpsOpts.InsecureSkipVerify {
+			clientOptions = append(clientOptions, WithInsecureSkipVerify())
+		}
 	}
 	client := DefaultHTTPClient(clientOptions...)
 

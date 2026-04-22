@@ -79,6 +79,17 @@ const (
 	defaultRetries  = 5
 )
 
+func ingressRouteProtocols(a map[string]string) []*string {
+	protocols := annotations.ExtractProtocolNames(a)
+	if len(protocols) == 0 {
+		return kong.StringSlice("https")
+	}
+
+	return lo.Map(protocols, func(protocol string, _ int) *string {
+		return kong.String(protocol)
+	})
+}
+
 // defaultServiceTimeoutKongFormat returns the defaultServiceTimeout in format
 // expected by Kong (pointer to an integer representing milliseconds).
 //
@@ -423,7 +434,7 @@ func (m *ingressTranslationMeta) translateIntoKongRoute() *kongstate.Route {
 			Name:              kong.String(routeName),
 			StripPath:         kong.Bool(false),
 			PreserveHost:      kong.Bool(true),
-			Protocols:         kong.StringSlice("http", "https"),
+			Protocols:         ingressRouteProtocols(m.parentIngress.GetAnnotations()),
 			RegexPriority:     kong.Int(0),
 			RequestBuffering:  kong.Bool(true),
 			ResponseBuffering: kong.Bool(true),

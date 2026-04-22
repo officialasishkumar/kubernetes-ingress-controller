@@ -35,11 +35,14 @@ func TestIngressExample(t *testing.T) {
 		WithSetup("deploy kong addon into cluster", featureSetup(
 			withControllerManagerOpts(helpers.ControllerManagerOptAdditionalWatchNamespace("default")),
 		)).
-		Assess("deploying to cluster works and HTTP traffic is routed to the service",
+		Assess("deploying to cluster works and HTTPS traffic is routed to the service",
 			func(ctx context.Context, t *testing.T, _ *envconf.Config) context.Context {
 				cleaner := GetFromCtxForT[*clusters.Cleaner](ctx, t)
 				cluster := GetClusterFromCtx(ctx)
-				proxyURL := GetHTTPURLFromCtx(ctx)
+				var (
+					proxyURLHTTP  = GetHTTPURLFromCtx(ctx)
+					proxyURLHTTPS = GetHTTPSURLFromCtx(ctx)
+				)
 
 				t.Logf("applying yaml manifest %s", ingressExampleManifests)
 				b, err := os.ReadFile(ingressExampleManifests)
@@ -51,8 +54,76 @@ func TestIngressExample(t *testing.T) {
 				t.Logf("verifying that the Ingress routes traffic properly")
 				helpers.EventuallyGETPath(
 					t,
-					proxyURL,
-					proxyURL.Host,
+					proxyURLHTTPS,
+					proxyURLHTTPS.String(),
+					"/",
+					&helpers.HTTPSOptions{
+						InsecureSkipVerify: true,
+					},
+					http.StatusOK,
+					"<title>httpbin.org</title>",
+					nil,
+					consts.IngressWait,
+					consts.WaitTick,
+				)
+
+				t.Logf("verifying that traffic is not served over HTTP")
+				helpers.EventuallyGETPath(
+					t,
+					proxyURLHTTP,
+					proxyURLHTTP.String(),
+					"/",
+					nil,
+					// Status code returned by Kong when HTTPS is required but request is made over HTTP.
+					http.StatusUpgradeRequired,
+					"",
+					nil,
+					consts.IngressWait,
+					consts.WaitTick,
+				)
+
+				return ctx
+			}).
+		Teardown(featureTeardown())
+
+	tenv.Test(t, f.Feature())
+}
+
+func TestIngressHTTPExample(t *testing.T) {
+	ingressExampleManifests := examplesManifestPath("ingress-http.yaml")
+
+	replaceIngressClassAnnotationInManifests := func(manifests string, ingressClass string) string {
+		return strings.ReplaceAll(manifests, "ingressClassName: kong", fmt.Sprintf("ingressClassName: %s", ingressClass))
+	}
+
+	f := features.
+		New("example").
+		WithLabel(testlabels.Example, testlabels.ExampleTrue).
+		WithLabel(testlabels.NetworkingFamily, testlabels.NetworkingFamilyIngress).
+		WithLabel(testlabels.Kind, testlabels.KindIngress).
+		WithSetup("deploy kong addon into cluster", featureSetup(
+			withControllerManagerOpts(helpers.ControllerManagerOptAdditionalWatchNamespace("default")),
+		)).
+		Assess("deploying to cluster works and HTTP traffic is routed to the service",
+			func(ctx context.Context, t *testing.T, _ *envconf.Config) context.Context {
+				cleaner := GetFromCtxForT[*clusters.Cleaner](ctx, t)
+				cluster := GetClusterFromCtx(ctx)
+				var (
+					proxyURLHTTP = GetHTTPURLFromCtx(ctx)
+				)
+
+				t.Logf("applying yaml manifest %s", ingressExampleManifests)
+				b, err := os.ReadFile(ingressExampleManifests)
+				assert.NoError(t, err)
+				manifest := replaceIngressClassAnnotationInManifests(string(b), GetIngressClassFromCtx(ctx))
+				assert.NoError(t, clusters.ApplyManifestByYAML(ctx, cluster, manifest))
+				cleaner.AddManifest(manifest)
+
+				t.Logf("verifying that the Ingress routes traffic properly")
+				helpers.EventuallyGETPath(
+					t,
+					proxyURLHTTP,
+					proxyURLHTTP.String(),
 					"/",
 					nil,
 					http.StatusOK,

@@ -345,7 +345,10 @@ func runHTTPRouteExampleTestScenario(manifestToUse string) func(ctx context.Cont
 	return func(ctx context.Context, t *testing.T, _ *envconf.Config) context.Context {
 		cleaner := GetFromCtxForT[*clusters.Cleaner](ctx, t)
 		cluster := GetClusterFromCtx(ctx)
-		proxyURL := GetHTTPURLFromCtx(ctx)
+		var (
+			proxyURLHTTP  = GetHTTPURLFromCtx(ctx)
+			proxyURLHTTPS = GetHTTPSURLFromCtx(ctx)
+		)
 
 		t.Logf("applying yaml manifest %s", manifestToUse)
 		manifest, err := os.ReadFile(manifestToUse)
@@ -358,10 +361,12 @@ func runHTTPRouteExampleTestScenario(manifestToUse string) func(ctx context.Cont
 		t.Logf("verifying that the HTTPRoute becomes routable")
 		helpers.EventuallyGETPath(
 			t,
-			proxyURL,
-			proxyURL.Host,
+			proxyURLHTTPS,
+			proxyURLHTTPS.String(),
 			"/httproute-testing",
-			nil,
+			&helpers.HTTPSOptions{
+				InsecureSkipVerify: true,
+			},
 			http.StatusOK,
 			"echo-1",
 			nil,
@@ -372,12 +377,29 @@ func runHTTPRouteExampleTestScenario(manifestToUse string) func(ctx context.Cont
 		t.Logf("verifying that the backendRefs are being loadbalanced")
 		helpers.EventuallyGETPath(
 			t,
-			proxyURL,
-			proxyURL.Host,
+			proxyURLHTTPS,
+			proxyURLHTTPS.String(),
 			"/httproute-testing",
-			nil,
+			&helpers.HTTPSOptions{
+				InsecureSkipVerify: true,
+			},
 			http.StatusOK,
 			"echo-2",
+			nil,
+			consts.IngressWait,
+			consts.WaitTick,
+		)
+
+		t.Logf("verifying that the backendRefs are not reached through HTTP listener")
+		helpers.EventuallyGETPath(
+			t,
+			proxyURLHTTP,
+			proxyURLHTTP.String(),
+			"/httproute-testing",
+			nil,
+			// Status code returned by Kong when HTTPS is required but request is made over HTTP.
+			http.StatusUpgradeRequired,
+			"",
 			nil,
 			consts.IngressWait,
 			consts.WaitTick,

@@ -187,11 +187,11 @@ func TestIngressDefaultBackend(t *testing.T) {
 	cleaner.Add(ingress)
 
 	t.Log("matching path")
-	helpers.EventuallyGETPath(t, nil, proxyHTTPURL.String(), "/foo", nil, http.StatusOK, "<title>httpbin.org</title>", nil, ingressWait, waitTick)
+	helpers.EventuallyGETPath(t, nil, proxyHTTPSURL.String(), "/foo", &helpers.HTTPSOptions{InsecureSkipVerify: true}, http.StatusOK, "<title>httpbin.org</title>", nil, ingressWait, waitTick)
 
 	t.Log("non matching path - use default backend")
 	helpers.EventuallyGETPath(
-		t, nil, proxyHTTPURL.String(), fmt.Sprintf("/status/%d", http.StatusTeapot), nil, http.StatusTeapot, "", nil, ingressWait, waitTick,
+		t, nil, proxyHTTPSURL.String(), fmt.Sprintf("/status/%d", http.StatusTeapot), &helpers.HTTPSOptions{InsecureSkipVerify: true}, http.StatusTeapot, "", nil, ingressWait, waitTick,
 	)
 }
 
@@ -584,9 +584,9 @@ func TestIngressClassRegexToggle(t *testing.T) {
 	// entirely, which would be bad for other tests.
 	t.Log("waiting for ingress path to become available")
 	require.Eventually(t, func() bool {
-		resp, err := helpers.DefaultHTTPClient().Get(fmt.Sprintf("%s/test_ingress_class_regex_toggle/999", proxyHTTPURL))
+		resp, err := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify()).Get(fmt.Sprintf("%s/test_ingress_class_regex_toggle/999", proxyHTTPSURL))
 		if err != nil {
-			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			return false
 		}
 		defer resp.Body.Close()
@@ -710,9 +710,9 @@ func TestIngressRegexPrefix(t *testing.T) {
 
 	t.Log("waiting for ingress path to become available")
 	require.Eventually(t, func() bool {
-		resp, err := helpers.DefaultHTTPClient().Get(fmt.Sprintf("%s/test_ingress_regex_prefix/999", proxyHTTPURL))
+		resp, err := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify()).Get(fmt.Sprintf("%s/test_ingress_regex_prefix/999", proxyHTTPSURL))
 		if err != nil {
-			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			return false
 		}
 		defer resp.Body.Close()
@@ -726,9 +726,9 @@ func TestIngressRegexPrefix(t *testing.T) {
 		return false
 	}, ingressWait, waitTick)
 	require.Eventually(t, func() bool {
-		resp, err := helpers.DefaultHTTPClient().Get(fmt.Sprintf("%s/test_ingress_regex_prefix_nonstandard/999", proxyHTTPURL))
+		resp, err := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify()).Get(fmt.Sprintf("%s/test_ingress_regex_prefix_nonstandard/999", proxyHTTPSURL))
 		if err != nil {
-			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			return false
 		}
 		defer resp.Body.Close()
@@ -742,9 +742,9 @@ func TestIngressRegexPrefix(t *testing.T) {
 		return false
 	}, ingressWait, waitTick)
 	require.Eventually(t, func() bool {
-		resp, err := helpers.DefaultHTTPClient().Get(fmt.Sprintf("%s/~/test_ingress_regex_prefix_nonstandard_default", proxyHTTPURL))
+		resp, err := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify()).Get(fmt.Sprintf("%s/~/test_ingress_regex_prefix_nonstandard_default", proxyHTTPSURL))
 		if err != nil {
-			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			return false
 		}
 		defer resp.Body.Close()
@@ -1000,11 +1000,11 @@ func TestIngressMatchByHost(t *testing.T) {
 	cleaner.Add(ingress)
 
 	t.Log("try to access the ingress by matching host")
-	req := helpers.MustHTTPRequest(t, http.MethodGet, "test.example", "/", nil)
+	req := helpers.MustHTTPRequest(t, http.MethodGet, "https://test.example", "/", nil)
 	require.Eventually(t, func() bool {
-		resp, err := helpers.DefaultHTTPClient(helpers.WithResolveHostTo(proxyHTTPURL.Host)).Do(req)
+		resp, err := helpers.DefaultHTTPClient(helpers.WithResolveHostTo(proxyHTTPSURL.Host), helpers.WithInsecureSkipVerify()).Do(req)
 		if err != nil {
-			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			return false
 		}
 		defer resp.Body.Close()
@@ -1019,8 +1019,8 @@ func TestIngressMatchByHost(t *testing.T) {
 	}, ingressWait, waitTick)
 
 	t.Log("try to access the ingress by unmatching host, should return 404")
-	req = helpers.MustHTTPRequest(t, http.MethodGet, "foo.example", "/", nil)
-	resp, err := helpers.DefaultHTTPClient(helpers.WithResolveHostTo(proxyHTTPURL.Host)).Do(req)
+	req = helpers.MustHTTPRequest(t, http.MethodGet, "https://foo.example", "/", nil)
+	resp, err := helpers.DefaultHTTPClient(helpers.WithResolveHostTo(proxyHTTPSURL.Host), helpers.WithInsecureSkipVerify()).Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 	require.Equal(t, resp.StatusCode, http.StatusNotFound)
@@ -1043,11 +1043,11 @@ func TestIngressMatchByHost(t *testing.T) {
 
 	t.Log("try to access the ingress by matching host")
 
-	req = helpers.MustHTTPRequest(t, http.MethodGet, "test0.example", "/", nil)
+	req = helpers.MustHTTPRequest(t, http.MethodGet, "https://test0.example", "/", nil)
 	require.Eventually(t, func() bool {
-		resp, err := helpers.DefaultHTTPClient(helpers.WithResolveHostTo(proxyHTTPURL.Host)).Do(req)
+		resp, err := helpers.DefaultHTTPClient(helpers.WithResolveHostTo(proxyHTTPSURL.Host), helpers.WithInsecureSkipVerify()).Do(req)
 		if err != nil {
-			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			return false
 		}
 		defer resp.Body.Close()
@@ -1062,8 +1062,8 @@ func TestIngressMatchByHost(t *testing.T) {
 	}, ingressWait, waitTick)
 
 	t.Log("try to access the ingress by unmatching host, should return 404")
-	req = helpers.MustHTTPRequest(t, http.MethodGet, "test.another", "/", nil)
-	resp, err = helpers.DefaultHTTPClient(helpers.WithResolveHostTo(proxyHTTPURL.Host)).Do(req)
+	req = helpers.MustHTTPRequest(t, http.MethodGet, "https://test.another", "/", nil)
+	resp, err = helpers.DefaultHTTPClient(helpers.WithResolveHostTo(proxyHTTPSURL.Host), helpers.WithInsecureSkipVerify()).Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 	require.Equal(t, resp.StatusCode, http.StatusNotFound)

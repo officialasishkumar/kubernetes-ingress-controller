@@ -143,7 +143,7 @@ func TestConsumerCredential(t *testing.T) {
 
 	t.Logf("validating that consumer has access")
 	assert.Eventually(t, func() bool {
-		req := helpers.MustHTTPRequest(t, http.MethodGet, proxyHTTPSURL.Host, "/test_consumer_credential", nil)
+		req := helpers.MustHTTPRequest(t, http.MethodGet, proxyHTTPSURL.String(), "/test_consumer_credential", nil)
 		req.SetBasicAuth("test_consumer_credential", "test_consumer_credential")
 		resp, err := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify()).Do(req)
 		if err != nil {

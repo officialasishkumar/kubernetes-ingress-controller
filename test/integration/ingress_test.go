@@ -1108,7 +1108,7 @@ func TestIngressRewriteURI(t *testing.T) {
 	// wait for first successful response. After it all subsequent must be successful too.
 	t.Log("wait for the Ingress direct to become available")
 	const path = "image/jpeg"
-	helpers.EventuallyGETPath(t, proxyHTTPURL, serviceDomainDirect, path, nil, http.StatusOK, consts.JPEGMagicNumber, nil, ingressWait, waitTick)
+	helpers.EventuallyGETPath(t, proxyHTTPSURL, "https://"+serviceDomainDirect, path, &helpers.HTTPSOptions{InsecureSkipVerify: true}, http.StatusOK, consts.JPEGMagicNumber, nil, ingressWait, waitTick)
 
 	waitForMainTestToFinish, cancelBackgroundTest := context.WithCancel(ctx)
 	backgroundTestError := make(chan error)
@@ -1135,9 +1135,9 @@ func TestIngressRewriteURI(t *testing.T) {
 			case <-time.After(50 * time.Millisecond):
 			}
 			cntAttempts++
-			resp, err := helpers.DefaultHTTPClient(helpers.WithResolveHostTo(proxyHTTPURL.Host)).Do(helpers.MustHTTPRequest(t, http.MethodGet, serviceDomainDirect, path, nil))
+			resp, err := helpers.DefaultHTTPClient(helpers.WithResolveHostTo(proxyHTTPSURL.Host), helpers.WithInsecureSkipVerify()).Do(helpers.MustHTTPRequest(t, http.MethodGet, serviceDomainDirect, path, nil))
 			if err != nil {
-				t.Logf("WARNING: Ingress without rewrite - http request failed for GET %s/%s to %s: %v", serviceDomainDirect, path, proxyHTTPURL, err)
+				t.Logf("WARNING: Ingress without rewrite - http request failed for GET %s/%s to %s: %v", serviceDomainDirect, path, proxyHTTPSURL, err)
 				continue
 			}
 			if resp.StatusCode == http.StatusOK {
@@ -1177,10 +1177,10 @@ func TestIngressRewriteURI(t *testing.T) {
 	cleaner.Add(ingressRewrite)
 
 	t.Log("try to access the ingress with valid capture group")
-	helpers.EventuallyGETPath(t, proxyHTTPURL, serviceDomainRewrite, "/foo/jpeg", nil, http.StatusOK, consts.JPEGMagicNumber, nil, ingressWait, waitTick)
+	helpers.EventuallyGETPath(t, proxyHTTPSURL, "https://"+serviceDomainRewrite, "/foo/jpeg", &helpers.HTTPSOptions{InsecureSkipVerify: true}, http.StatusOK, consts.JPEGMagicNumber, nil, ingressWait, waitTick)
 
 	t.Log("try to access the ingress with invalid capture group, should return 404")
-	helpers.EventuallyGETPath(t, proxyHTTPURL, serviceDomainRewrite, "/", nil, http.StatusNotFound, "", nil, ingressWait, waitTick)
+	helpers.EventuallyGETPath(t, proxyHTTPSURL, "https://"+serviceDomainRewrite, "/", &helpers.HTTPSOptions{InsecureSkipVerify: true}, http.StatusNotFound, "", nil, ingressWait, waitTick)
 
 	ingressRewrite, err = env.Cluster().Client().NetworkingV1().Ingresses(ns.Name).Get(ctx, ingressRewrite.Name, metav1.GetOptions{})
 	require.NoError(t, err)
@@ -1193,7 +1193,7 @@ func TestIngressRewriteURI(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Log("try to access the ingress with new valid capture group")
-	helpers.EventuallyGETPath(t, proxyHTTPURL, serviceDomainRewrite, "/foo/jpeg", nil, http.StatusOK, consts.JPEGMagicNumber, nil, ingressWait, waitTick)
+	helpers.EventuallyGETPath(t, proxyHTTPSURL, "https://"+serviceDomainRewrite, "/foo/jpeg", &helpers.HTTPSOptions{}, http.StatusOK, consts.JPEGMagicNumber, nil, ingressWait, waitTick)
 
 	ingressRewrite, err = env.Cluster().Client().NetworkingV1().Ingresses(ns.Name).Get(ctx, ingressRewrite.Name, metav1.GetOptions{})
 	require.NoError(t, err)
@@ -1204,7 +1204,7 @@ func TestIngressRewriteURI(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Log("try to access the ingress with new rewrite annotation")
-	helpers.EventuallyGETPath(t, proxyHTTPURL, serviceDomainRewrite, "/foo/test/png", nil, http.StatusOK, consts.PNGMagicNumber, nil, ingressWait, waitTick)
+	helpers.EventuallyGETPath(t, proxyHTTPSURL, "https://"+serviceDomainRewrite, "/foo/test/png", &helpers.HTTPSOptions{InsecureSkipVerify: true}, http.StatusOK, consts.PNGMagicNumber, nil, ingressWait, waitTick)
 
 	cancelBackgroundTest()
 	require.NoError(t, <-backgroundTestError, "for Ingress without rewrite run in background")

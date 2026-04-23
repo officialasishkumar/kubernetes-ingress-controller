@@ -4,7 +4,9 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"maps"
 	pathlib "path"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -179,7 +181,7 @@ type TranslateHTTPRouteRulesToKongRouteOptions struct {
 	ExpressionRoutes      bool
 	SupportRedirectPlugin bool
 	// Protocols is the list of Kong route protocols to set on translated routes.
-	// When empty, it defaults to ["http", "https"].
+	// When empty, it defaults to ["https"] to be secure by default.
 	Protocols []*string
 }
 
@@ -802,32 +804,32 @@ func generateKongstateHTTPRoute(routeName string, ingressObjectInfo util.K8sObje
 	return r
 }
 
-// protocolsOrDefault returns the given protocols if non-empty, or ["http", "https"] as a safe fallback.
+// protocolsOrDefault returns the given protocols if non-empty, or ["https"] as a secure-by-default fallback.
 func protocolsOrDefault(protocols []*string) []*string {
 	if len(protocols) > 0 {
 		return protocols
 	}
-	return kong.StringSlice("http", "https")
+	return kong.StringSlice("https")
 }
 
 // protocolsFromHTTPRoutesGatewayListeners derives Kong route protocols from the Gateway listeners
 // referenced by all provided HTTPRoutes' parentRefs.
 // It collects unique protocols from all matching listeners.
-// Returns ["http", "https"] as a fallback when no matching Gateway listeners are found.
+// Returns ["https"] (secure as default) as a fallback when no matching Gateway listeners are found.
 func protocolsFromHTTPRoutesGatewayListeners(storer store.Storer, routes []*gatewayapi.HTTPRoute) []*string {
 	protoSet := make(map[string]struct{})
 	for _, route := range routes {
 		for _, pr := range route.Spec.ParentRefs {
 			ns := route.Namespace
-			if pr.Namespace != nil && string(*pr.Namespace) != "" {
-				ns = string(*pr.Namespace)
+			if prns := string(lo.FromPtr(pr.Namespace)); prns != "" {
+				ns = prns
 			}
 			gw, err := storer.GetGateway(ns, string(pr.Name))
 			if err != nil {
 				continue // Gateway not found, skip this parentRef.
 			}
 			for _, l := range gw.Spec.Listeners {
-				if pr.SectionName != nil && *pr.SectionName != l.Name {
+				if prsn := lo.FromPtr(pr.SectionName); prsn != l.Name {
 					continue
 				}
 				switch l.Protocol {
@@ -842,18 +844,10 @@ func protocolsFromHTTPRoutesGatewayListeners(storer store.Storer, routes []*gate
 			}
 		}
 	}
-	if len(protoSet) == 0 {
-		// No matching Gateway listeners found; default to both protocols for backward compatibility.
-		return kong.StringSlice("http", "https")
-	}
-	protocols := make([]string, 0, len(protoSet))
-	for p := range protoSet {
-		protocols = append(protocols, p)
-	}
-	sort.Strings(protocols)
-	return lo.Map(protocols, func(p string, _ int) *string {
-		return kong.String(p)
-	})
+
+	return protocolsOrDefault(
+		kong.StringSlice(slices.Sorted(maps.Keys(protoSet))...),
+	)
 }
 
 // convertGatewayMatchHeadersToKongRouteMatchHeaders takes an input list of Gateway APIs HTTPHeaderMatch

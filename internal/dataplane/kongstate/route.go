@@ -54,7 +54,7 @@ func (r *Route) normalizeProtocols() {
 	}
 
 	if grpc && http {
-		r.Protocols = kong.StringSlice("http", "https")
+		r.Protocols = kong.StringSlice("https")
 	}
 
 	if grpc {

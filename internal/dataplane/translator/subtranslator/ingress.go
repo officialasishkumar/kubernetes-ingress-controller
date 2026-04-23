@@ -3,6 +3,7 @@ package subtranslator
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -80,14 +81,19 @@ const (
 )
 
 func ingressRouteProtocols(a map[string]string) []*string {
-	protocols := annotations.ExtractProtocolNames(a)
-	if len(protocols) == 0 {
+	protocolsFromAnnotation := annotations.ExtractProtocolNames(a)
+	slices.Sort(protocolsFromAnnotation)
+	if len(protocolsFromAnnotation) == 0 {
 		return kong.StringSlice("https")
 	}
 
-	return lo.Map(protocols, func(protocol string, _ int) *string {
-		return kong.String(protocol)
-	})
+	return protocolsOrDefault(
+		lo.Map(
+			protocolsFromAnnotation, func(protocol string, _ int) *string {
+				return kong.String(protocol)
+			},
+		),
+	)
 }
 
 // defaultServiceTimeoutKongFormat returns the defaultServiceTimeout in format

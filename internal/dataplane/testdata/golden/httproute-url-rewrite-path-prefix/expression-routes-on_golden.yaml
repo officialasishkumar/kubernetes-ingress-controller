@@ -27,7 +27,6 @@ services:
     preserve_host: true
     priority: 35184422424575
     protocols:
-    - http
     - https
     strip_path: false
     tags:

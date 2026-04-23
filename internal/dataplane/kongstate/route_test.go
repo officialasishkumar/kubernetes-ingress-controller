@@ -133,7 +133,7 @@ func TestOverrideRoute(t *testing.T) {
 			inRoute: Route{
 				Route: kong.Route{
 					Hosts:     kong.StringSlice("foo.com"),
-					Protocols: kong.StringSlice("http", "https"),
+					Protocols: kong.StringSlice("https"),
 				},
 			},
 			inAnnotations: map[string]string{
@@ -142,7 +142,7 @@ func TestOverrideRoute(t *testing.T) {
 			expectedRoute: Route{
 				Route: kong.Route{
 					Hosts:     kong.StringSlice("foo.com"),
-					Protocols: kong.StringSlice("http", "https"),
+					Protocols: kong.StringSlice("https"),
 					Headers: map[string][]string{
 						"foo-header": {"bar-value"},
 					},
@@ -332,12 +332,12 @@ func TestNormalizeProtocols(t *testing.T) {
 		{
 			Route{
 				Route: kong.Route{
-					Protocols: kong.StringSlice("http", "https"),
+					Protocols: kong.StringSlice("https"),
 				},
 			},
 			Route{
 				Route: kong.Route{
-					Protocols: kong.StringSlice("http", "https"),
+					Protocols: kong.StringSlice("https"),
 				},
 			},
 		},
@@ -349,7 +349,7 @@ func TestNormalizeProtocols(t *testing.T) {
 			},
 			Route{
 				Route: kong.Route{
-					Protocols: kong.StringSlice("http", "https"),
+					Protocols: kong.StringSlice("https"),
 				},
 			},
 		},
@@ -385,7 +385,7 @@ func TestUseSSLProtocol(t *testing.T) {
 		{
 			Route{
 				Route: kong.Route{
-					Protocols: kong.StringSlice("http", "https"),
+					Protocols: kong.StringSlice("https"),
 				},
 			},
 			kong.Route{

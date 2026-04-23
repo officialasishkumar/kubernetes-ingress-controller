@@ -16,7 +16,6 @@ services:
     preserve_host: true
     priority: 35184414035967
     protocols:
-    - http
     - https
     strip_path: true
     tags:
@@ -47,7 +46,6 @@ services:
     preserve_host: true
     priority: 35184430813183
     protocols:
-    - http
     - https
     strip_path: true
     tags:
@@ -64,7 +62,6 @@ services:
     preserve_host: true
     priority: 35184405647359
     protocols:
-    - http
     - https
     strip_path: true
     tags:
@@ -96,7 +93,6 @@ services:
     preserve_host: true
     priority: 35184514699263
     protocols:
-    - http
     - https
     strip_path: true
     tags:

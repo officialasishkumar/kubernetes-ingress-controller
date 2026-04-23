@@ -18,7 +18,6 @@ services:
     - /nginx/
     preserve_host: true
     protocols:
-    - http
     - https
     strip_path: true
     tags:
@@ -53,7 +52,6 @@ services:
     - /content/
     preserve_host: true
     protocols:
-    - http
     - https
     strip_path: true
     tags:
@@ -88,7 +86,6 @@ services:
     - /httproute-testing/
     preserve_host: true
     protocols:
-    - http
     - https
     strip_path: true
     tags:

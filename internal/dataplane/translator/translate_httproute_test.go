@@ -220,7 +220,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 									Name:         kong.String("httproute.default.basic-httproute.0.0"),
 									PreserveHost: kong.Bool(true),
 									Protocols: []*string{
-										kong.String("http"),
 										kong.String("https"),
 									},
 									Hosts: []*string{
@@ -297,7 +296,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 									Name:         kong.String("httproute.default.basic-httproute.0.0"),
 									PreserveHost: kong.Bool(true),
 									Protocols: []*string{
-										kong.String("http"),
 										kong.String("https"),
 									},
 									Tags: []*string{
@@ -375,7 +373,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 									},
 									PreserveHost: kong.Bool(true),
 									Protocols: []*string{
-										kong.String("http"),
 										kong.String("https"),
 									},
 									StripPath: lo.ToPtr(false),
@@ -453,7 +450,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 									},
 									PreserveHost: kong.Bool(true),
 									Protocols: []*string{
-										kong.String("http"),
 										kong.String("https"),
 									},
 									StripPath: lo.ToPtr(false),
@@ -533,7 +529,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 									},
 									PreserveHost: kong.Bool(true),
 									Protocols: []*string{
-										kong.String("http"),
 										kong.String("https"),
 									},
 									StripPath: lo.ToPtr(false),
@@ -623,7 +618,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 										},
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										StripPath: lo.ToPtr(false),
@@ -717,7 +711,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 									},
 									PreserveHost: kong.Bool(true),
 									Protocols: []*string{
-										kong.String("http"),
 										kong.String("https"),
 									},
 									StripPath: lo.ToPtr(false),
@@ -757,7 +750,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 									},
 									PreserveHost: kong.Bool(true),
 									Protocols: []*string{
-										kong.String("http"),
 										kong.String("https"),
 									},
 									StripPath: lo.ToPtr(false),
@@ -877,7 +869,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 										},
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										StripPath: lo.ToPtr(false),
@@ -920,7 +911,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 										},
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										StripPath: lo.ToPtr(false),
@@ -1034,7 +1024,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 										},
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										StripPath: lo.ToPtr(false),
@@ -1074,7 +1063,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 										},
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										StripPath: lo.ToPtr(false),
@@ -1203,7 +1191,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 										},
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										StripPath: lo.ToPtr(false),
@@ -1229,7 +1216,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 										},
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										StripPath: lo.ToPtr(false),
@@ -1256,7 +1242,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 										},
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										StripPath: lo.ToPtr(false),
@@ -1404,7 +1389,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 										},
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										StripPath: lo.ToPtr(false),
@@ -1430,7 +1414,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 										},
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										StripPath: lo.ToPtr(false),
@@ -1458,7 +1441,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 										},
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										StripPath: lo.ToPtr(false),
@@ -1558,7 +1540,6 @@ func TestIngressRulesFromHTTPRoutes(t *testing.T) {
 									Name:         kong.String("httproute.default.basic-httproute.0.0"),
 									PreserveHost: kong.Bool(true),
 									Protocols: []*string{
-										kong.String("http"),
 										kong.String("https"),
 									},
 									Hosts: []*string{
@@ -1701,7 +1682,6 @@ func TestIngressRulesFromHTTPRoutesCombinedServicesAcrossHTTPRoutes(t *testing.T
 										Name:         kong.String("httproute.default.httproute-1.0.0"),
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										Paths: kong.StringSlice(
@@ -1801,7 +1781,6 @@ func TestIngressRulesFromHTTPRoutesCombinedServicesAcrossHTTPRoutes(t *testing.T
 										Name:         kong.String("httproute.default.httproute-1.0.0"),
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										Paths: kong.StringSlice(
@@ -1823,7 +1802,6 @@ func TestIngressRulesFromHTTPRoutesCombinedServicesAcrossHTTPRoutes(t *testing.T
 										Name:         kong.String("httproute.default.httproute-2.0.0"),
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										Paths: kong.StringSlice(
@@ -1945,7 +1923,6 @@ func TestIngressRulesFromHTTPRoutesCombinedServicesAcrossHTTPRoutes(t *testing.T
 										Name:         kong.String("httproute.default.httproute-1.0.0"),
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										Paths: kong.StringSlice(
@@ -1985,7 +1962,6 @@ func TestIngressRulesFromHTTPRoutesCombinedServicesAcrossHTTPRoutes(t *testing.T
 										Name:         kong.String("httproute.ns-alter.httproute-2.0.0"),
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										Paths: kong.StringSlice(
@@ -2067,7 +2043,6 @@ func TestIngressRulesFromHTTPRoutesCombinedServicesAcrossHTTPRoutes(t *testing.T
 										Name:         kong.String("httproute.default.httproute-1.0.0"),
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										Paths: kong.StringSlice(
@@ -2121,7 +2096,6 @@ func TestIngressRulesFromHTTPRoutesCombinedServicesAcrossHTTPRoutes(t *testing.T
 										Name:         kong.String("httproute.default.httproute-1.1.0"),
 										PreserveHost: kong.Bool(true),
 										Protocols: []*string{
-											kong.String("http"),
 											kong.String("https"),
 										},
 										Paths: kong.StringSlice(
@@ -2261,7 +2235,6 @@ func TestIngressRulesFromHTTPRoutes_RegexPrefix(t *testing.T) {
 									},
 									PreserveHost: kong.Bool(true),
 									Protocols: []*string{
-										kong.String("http"),
 										kong.String("https"),
 									},
 									StripPath: lo.ToPtr(false),

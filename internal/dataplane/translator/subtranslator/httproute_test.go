@@ -1770,7 +1770,6 @@ func TestTranslateHTTPRouteRulesMetaToKongstateRoutes(t *testing.T) {
 						PreserveHost: kong.Bool(true),
 						StripPath:    kong.Bool(false),
 						Protocols: []*string{
-							kong.String("http"),
 							kong.String("https"),
 						},
 						Tags: []*string{

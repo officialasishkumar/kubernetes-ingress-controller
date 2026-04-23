@@ -18,7 +18,6 @@ services:
     - /httpbin-prod-only/
     preserve_host: true
     protocols:
-    - http
     - https
     strip_path: true
     tags:
@@ -51,7 +50,6 @@ services:
     - /httpbin-with-test/
     preserve_host: true
     protocols:
-    - http
     - https
     strip_path: true
     tags:

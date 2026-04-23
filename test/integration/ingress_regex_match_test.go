@@ -241,6 +241,7 @@ func TestIngressRegexMatchHeader(t *testing.T) {
 					proxyHTTPSURL,
 					proxyHTTPSURL.String(),
 					"/",
+					&helpers.HTTPSOptions{InsecureSkipVerify: true},
 					ingressWait,
 					waitTick,
 					map[string]string{matchHeaderKey: header},

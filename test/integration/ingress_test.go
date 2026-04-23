@@ -81,9 +81,9 @@ func TestIngressEssentials(t *testing.T) {
 
 	t.Log("waiting for routes from Ingress to be operational")
 	require.Eventually(t, func() bool {
-		resp, err := helpers.DefaultHTTPClient().Get(fmt.Sprintf("%s/test_ingress_essentials", proxyHTTPURL))
+		resp, err := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify()).Get(fmt.Sprintf("%s/test_ingress_essentials", proxyHTTPSURL))
 		if err != nil {
-			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			return false
 		}
 		defer resp.Body.Close()
@@ -114,7 +114,7 @@ func TestIngressEssentials(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Logf("verifying that removing .Spec.IngressClassName %q from ingress causes routes to disconnect", consts.IngressClass)
-	helpers.EventuallyExpectHTTP404WithNoRoute(t, proxyHTTPURL, proxyHTTPURL.Host, "/test_ingress_essentials", ingressWait, waitTick, nil)
+	helpers.EventuallyGETPath(t, nil, proxyHTTPSURL.String(), "/test_ingress_essentials", &helpers.HTTPSOptions{InsecureSkipVerify: true}, http.StatusNotFound, "no Route matched with those values", nil, ingressWait, waitTick)
 
 	t.Logf("putting the .Spec.IngressClassName %q back on ingress", consts.IngressClass)
 	err = retry.RetryOnConflict(retry.DefaultRetry, func() error {
@@ -130,9 +130,9 @@ func TestIngressEssentials(t *testing.T) {
 
 	t.Log("waiting for routes from Ingress to be operational after reintroducing .Spec.IngressClassName")
 	require.Eventually(t, func() bool {
-		resp, err := helpers.DefaultHTTPClient().Get(fmt.Sprintf("%s/test_ingress_essentials", proxyHTTPURL))
+		resp, err := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify()).Get(fmt.Sprintf("%s/test_ingress_essentials", proxyHTTPSURL))
 		if err != nil {
-			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			return false
 		}
 		defer resp.Body.Close()
@@ -150,7 +150,7 @@ func TestIngressEssentials(t *testing.T) {
 
 	t.Log("deleting Ingress and waiting for routes to be torn down")
 	require.NoError(t, clusters.DeleteIngress(ctx, env.Cluster(), ns.Name, ingress))
-	helpers.EventuallyExpectHTTP404WithNoRoute(t, proxyHTTPURL, proxyHTTPURL.Host, "/test_ingress_essentials", ingressWait, waitTick, nil)
+	helpers.EventuallyGETPath(t, nil, proxyHTTPSURL.String(), "/test_ingress_essentials", &helpers.HTTPSOptions{InsecureSkipVerify: true}, http.StatusNotFound, "no Route matched with those values", nil, ingressWait, waitTick)
 }
 
 func TestIngressDefaultBackend(t *testing.T) {
@@ -232,20 +232,20 @@ func TestIngressClassNameSpec(t *testing.T) {
 	t.Log("waiting for routes from Ingress to be operational")
 	defer func() {
 		if t.Failed() {
-			resp, err := helpers.DefaultHTTPClient().Get(fmt.Sprintf("%s/test_ingressclassname_spec", proxyHTTPURL))
+			resp, err := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify()).Get(fmt.Sprintf("%s/test_ingressclassname_spec", proxyHTTPSURL))
 			if err != nil {
-				t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+				t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			}
 			t.Logf("TestIngressClassNameSpec failed, current GET %s/test_ingressclassname_spec status code is %d",
-				proxyHTTPURL, resp.StatusCode)
+				proxyHTTPSURL, resp.StatusCode)
 			resp.Body.Close()
 		}
 	}()
 
 	require.Eventually(t, func() bool {
-		resp, err := helpers.DefaultHTTPClient().Get(fmt.Sprintf("%s/test_ingressclassname_spec", proxyHTTPURL))
+		resp, err := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify()).Get(fmt.Sprintf("%s/test_ingressclassname_spec", proxyHTTPSURL))
 		if err != nil {
-			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			return false
 		}
 		defer resp.Body.Close()
@@ -266,7 +266,7 @@ func TestIngressClassNameSpec(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Logf("verifying that removing the IngressClassName %q from ingress causes routes to disconnect", consts.IngressClass)
-	helpers.EventuallyExpectHTTP404WithNoRoute(t, proxyHTTPURL, proxyHTTPURL.Host, "/test_ingressclassname_spec", ingressWait, waitTick, nil)
+	helpers.EventuallyGETPath(t, nil, proxyHTTPSURL.String(), "/test_ingressclassname_spec", &helpers.HTTPSOptions{InsecureSkipVerify: true}, http.StatusNotFound, "no Route matched with those values", nil, ingressWait, waitTick)
 
 	t.Logf("putting the IngressClassName %q back on ingress", consts.IngressClass)
 	err = setIngressClassNameWithRetry(ctx, ns.Name, ingress, kong.String(consts.IngressClass))
@@ -274,9 +274,9 @@ func TestIngressClassNameSpec(t *testing.T) {
 
 	t.Log("waiting for routes from Ingress to be operational after reintroducing ingress class annotation")
 	require.Eventually(t, func() bool {
-		resp, err := helpers.DefaultHTTPClient().Get(fmt.Sprintf("%s/test_ingressclassname_spec", proxyHTTPURL))
+		resp, err := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify()).Get(fmt.Sprintf("%s/test_ingressclassname_spec", proxyHTTPSURL))
 		if err != nil {
-			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			return false
 		}
 		defer resp.Body.Close()
@@ -295,7 +295,7 @@ func TestIngressClassNameSpec(t *testing.T) {
 
 	t.Log("deleting Ingress and waiting for routes to be torn down")
 	require.NoError(t, clusters.DeleteIngress(ctx, env.Cluster(), ns.Name, ingress))
-	helpers.EventuallyExpectHTTP404WithNoRoute(t, proxyHTTPURL, proxyHTTPURL.Host, "/test_ingressclassname_spec", ingressWait, waitTick, nil)
+	helpers.EventuallyGETPath(t, nil, proxyHTTPSURL.String(), "/test_ingressclassname_spec", &helpers.HTTPSOptions{InsecureSkipVerify: true}, http.StatusNotFound, "no Route matched with those values", nil, ingressWait, waitTick)
 }
 
 func TestIngressServiceUpstream(t *testing.T) {
@@ -332,9 +332,9 @@ func TestIngressServiceUpstream(t *testing.T) {
 
 	t.Log("waiting for routes from Ingress to be operational")
 	require.Eventually(t, func() bool {
-		resp, err := helpers.DefaultHTTPClient().Get(fmt.Sprintf("%s/elsewhere", proxyHTTPURL))
+		resp, err := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify()).Get(fmt.Sprintf("%s/elsewhere", proxyHTTPSURL))
 		if err != nil {
-			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPURL, err)
+			t.Logf("WARNING: error while waiting for %s: %v", proxyHTTPSURL, err)
 			return false
 		}
 		defer resp.Body.Close()

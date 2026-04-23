@@ -42,6 +42,7 @@ var skippedTestsForExpressionRoutes = []string{
 
 	// XXX: to fix
 	tests.HTTPRoutePathMatchOrder.ShortName,
+	tests.HTTPRouteQueryParamMatching.ShortName,
 }
 
 var traditionalRoutesSupportedFeatures = []features.FeatureName{

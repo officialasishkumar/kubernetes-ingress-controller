@@ -282,7 +282,8 @@ func TestBackendTLSPolicy(t *testing.T) {
 			return ctx
 		}).
 		Assess("verify that if the verify-depth is lower than chain length, TLS handshake fails", func(ctx context.Context, t *testing.T, _ *envconf.Config) context.Context {
-			proxyURL := GetHTTPURLFromCtx(ctx)
+			proxyURL := GetHTTPSURLFromCtx(ctx)
+			cl := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify())
 			require.EventuallyWithT(t, func(t *assert.CollectT) {
 				req, err := http.NewRequest("GET", proxyURL.String()+echoRoute, nil)
 				if !assert.NoError(t, err) {
@@ -290,7 +291,7 @@ func TestBackendTLSPolicy(t *testing.T) {
 				}
 				req.Host = goEchoServerHostname
 
-				resp, err := http.DefaultClient.Do(req)
+				resp, err := cl.Do(req)
 				if !assert.NoError(t, err) {
 					return
 				}
@@ -319,7 +320,8 @@ func TestBackendTLSPolicy(t *testing.T) {
 				return true
 			}, consts.StatusWait, consts.WaitTick)
 
-			proxyURL := GetHTTPURLFromCtx(ctx)
+			proxyURL := GetHTTPSURLFromCtx(ctx)
+			cl := helpers.DefaultHTTPClient(helpers.WithInsecureSkipVerify())
 			require.EventuallyWithT(t, func(t *assert.CollectT) {
 				req, err := http.NewRequest("GET", proxyURL.String()+echoRoute, nil)
 				if !assert.NoError(t, err) {
@@ -327,7 +329,7 @@ func TestBackendTLSPolicy(t *testing.T) {
 				}
 				req.Host = goEchoServerHostname
 
-				resp, err := http.DefaultClient.Do(req)
+				resp, err := cl.Do(req)
 				if !assert.NoError(t, err) {
 					return
 				}

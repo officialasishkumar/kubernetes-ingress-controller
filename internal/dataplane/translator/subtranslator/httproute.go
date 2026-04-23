@@ -821,15 +821,15 @@ func protocolsFromHTTPRoutesGatewayListeners(storer store.Storer, routes []*gate
 	for _, route := range routes {
 		for _, pr := range route.Spec.ParentRefs {
 			ns := route.Namespace
-			if prns := string(lo.FromPtr(pr.Namespace)); prns != "" {
-				ns = prns
+			if pr.Namespace != nil && string(*pr.Namespace) != "" {
+				ns = string(*pr.Namespace)
 			}
 			gw, err := storer.GetGateway(ns, string(pr.Name))
 			if err != nil {
 				continue // Gateway not found, skip this parentRef.
 			}
 			for _, l := range gw.Spec.Listeners {
-				if prsn := lo.FromPtr(pr.SectionName); prsn != l.Name {
+				if pr.SectionName != nil && *pr.SectionName != l.Name {
 					continue
 				}
 				switch l.Protocol {
